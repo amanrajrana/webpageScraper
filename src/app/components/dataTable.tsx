@@ -111,14 +111,16 @@ export const columns = (
         const url: string = row.getValue("url");
         const path = "/" + url.split("/").slice(3).join("/");
         return (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="lowercase max-w-xs whitespace-nowrap text-ellipsis overflow-hidden hover:underline"
-          >
-            {path}
-          </a>
+          <div className="max-w-xs whitespace-nowrap text-ellipsis overflow-clip">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {path}
+            </a>
+          </div>
         );
       },
     },
@@ -275,29 +277,31 @@ export function DataTable({ data, setData }: Props) {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
-          <div className="space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>
