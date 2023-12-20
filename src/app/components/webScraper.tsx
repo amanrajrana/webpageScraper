@@ -14,7 +14,7 @@ export default function WebScraperSection() {
         <UrlInputBox setData={setData} />
       </div>
 
-      <DataTable /*data={data} setData={setData} */ />
+      <DataTable data={data} setData={setData} />
       <div className="fixed left-0 bottom-4 md:bottom-8 w-full flex justify-center">
         {data.length > 0 && <StickyDiv data={data} />}
       </div>

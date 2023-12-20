@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,28 +26,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { APIResponseType } from "@/types/type";
+import { useToast } from "@/components/ui/use-toast";
 
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-export const columns = (): ColumnDef<Payment>[] => {
+export const columns = (
+  handleRowDelete: Function
+): ColumnDef<APIResponseType>[] => {
   return [
     {
       id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
+      header: ({ table }) => {
+        return (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
+        );
+      },
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
@@ -59,7 +60,7 @@ export const columns = (): ColumnDef<Payment>[] => {
       enableHiding: false,
     },
     {
-      accessorKey: "status",
+      accessorKey: "title",
       header: ({ column }) => {
         return (
           <Button
@@ -71,48 +72,56 @@ export const columns = (): ColumnDef<Payment>[] => {
           </Button>
         );
       },
-      cell: ({ row }) => <div>{row.getValue("status")}</div>,
-    },
-    {
-      accessorKey: "email",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Path
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("email")}</div>
+        <div className="lowercase max-w-sm whitespace-nowrap text-ellipsis overflow-hidden">
+          {row.getValue("title")}
+        </div>
       ),
     },
     {
-      accessorKey: "amount",
+      accessorKey: "url",
+      header: () => <Button variant={"ghost"}>Path</Button>,
+      cell: ({ row }) => (
+        <div className="lowercase max-w-xs whitespace-nowrap text-ellipsis overflow-hidden">
+          {row.getValue("url")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "contentLength",
       header: () => <div className="text-right">Characters</div>,
-      cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
-        return <div className="text-right font-medium">{amount}</div>;
-      },
+      cell: ({ row }) => (
+        <div className="text-right font-medium">
+          {row.getValue("contentLength")}
+        </div>
+      ),
     },
     {
       accessorKey: "deleteRow",
       header: () => null,
-      cell: ({ row }) => (
-        <div className="flex justify-center">
-          <Button variant={"destructive"}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center">
+            <Button
+              onClick={() => handleRowDelete(row.original.url)}
+              variant={"destructive"}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 };
 
-export function DataTable() {
+type Props = {
+  data: APIResponseType[];
+  setData: React.Dispatch<React.SetStateAction<APIResponseType[]>>;
+};
+
+export function DataTable({ data, setData }: Props) {
+  const { toast } = useToast();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -120,18 +129,30 @@ export function DataTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [data, setData] = React.useState<Payment[]>([
-    {
-      id: "m5gr84i9",
-      amount: 316,
-      status: "success",
-      email: "ken99@yahoo.com",
-    },
-  ]);
+
+  function handleRowDelete(url: string) {
+    setData((prev) => prev.filter((item) => item.url !== url));
+
+    toast({
+      description: "Row deleted successfully",
+    });
+  }
+
+  function handleMultiRowDelete(urls: string[]) {
+    if (!urls.length) return;
+
+    setData((prev) => prev.filter((item) => !urls.includes(item.url)));
+
+    toast({
+      description: `${urls.length} Rows deleted successfully`,
+    });
+
+    table.toggleAllPageRowsSelected(false);
+  }
 
   const table = useReactTable({
     data,
-    columns: columns(),
+    columns: columns(handleRowDelete),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -149,67 +170,76 @@ export function DataTable() {
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between py-4">
+    <div className="w-full mx-auto max-w-5xl">
+      <div className="flex items-center justify-between py-4 gap-2">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter title..."
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-        <Button variant="destructive">Delete</Button>
+        <Button
+          disabled={!table.getSelectedRowModel().rows.length}
+          onClick={() =>
+            handleMultiRowDelete(
+              table.getSelectedRowModel().rows.map((row) => row.original.url)
+            )
+          }
+          variant="destructive"
+        >
+          Delete
+        </Button>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+      <div className="max-w-full overflow-x-auto">
+        <div className="rounded-md border min-w-max w-full">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
