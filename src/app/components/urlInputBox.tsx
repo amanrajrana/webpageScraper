@@ -21,8 +21,6 @@ type Props = {
 export default function UrlInputBox({ setData }: Props) {
   const { toast } = useToast();
 
-  const API = "https://api.amanraj.co";
-
   const [url, setUrl] = useState<string>("");
   const [isFetchAll, setIsFetchAll] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -47,8 +45,8 @@ export default function UrlInputBox({ setData }: Props) {
       // Call API to fetch data
       const response = await axios.get(
         isFetchAll
-          ? `${API}/api/scrape/multi-url?url=${url}`
-          : `${API}/api/scrape/single-url?url=${url}`
+          ? `/api/scrape/multi-url?url=${url}`
+          : `/api/scrape/single-url?url=${url}`
       );
 
       if (response.data) {
