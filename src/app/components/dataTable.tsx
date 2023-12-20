@@ -28,6 +28,12 @@ import {
 } from "@/components/ui/table";
 import { APIResponseType } from "@/types/type";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const columns = (
   handleRowDelete: Function
@@ -72,20 +78,49 @@ export const columns = (
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <div className="lowercase max-w-sm whitespace-nowrap text-ellipsis overflow-hidden">
-          {row.getValue("title")}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const title: string = row.getValue("title");
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="lowercase max-w-sm whitespace-nowrap text-ellipsis overflow-hidden">
+                  {title}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{title}</p>
+                <a
+                  href={row.getValue("url")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  Visit?
+                </a>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
     },
     {
       accessorKey: "url",
       header: () => <Button variant={"ghost"}>Path</Button>,
-      cell: ({ row }) => (
-        <div className="lowercase max-w-xs whitespace-nowrap text-ellipsis overflow-hidden">
-          {row.getValue("url")}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const url: string = row.getValue("url");
+        const path = "/" + url.split("/").slice(3).join("/");
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="lowercase max-w-xs whitespace-nowrap text-ellipsis overflow-hidden hover:underline"
+          >
+            {path}
+          </a>
+        );
+      },
     },
     {
       accessorKey: "contentLength",
