@@ -18,6 +18,8 @@ type Props = {
   setData: React.Dispatch<React.SetStateAction<APIResponseType[]>>;
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function UrlInputBox({ setData }: Props) {
   const { toast } = useToast();
 
@@ -44,9 +46,9 @@ export default function UrlInputBox({ setData }: Props) {
     try {
       // Call API to fetch data
       const response = await axios.get(
-        isFetchAll
-          ? `/api/scrape/multi-url?url=${url}`
-          : `/api/scrape/single-url?url=${url}`
+        `${API_URL}/api/scrape/${
+          isFetchAll ? "multi" : "single"
+        }-url?url=${url}`
       );
 
       if (response.data) {
