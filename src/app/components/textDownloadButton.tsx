@@ -35,11 +35,8 @@ export const TextContentDownloadButton = ({
   };
 
   return (
-    <Button
-      className="bg-green-600 text-white hover:bg-green-500"
-      onClick={downloadTextFile}
-    >
-      Download .txt File
+    <Button className="bg-black hover:bg-gray-950" onClick={downloadTextFile}>
+      Start Training
     </Button>
   );
 };

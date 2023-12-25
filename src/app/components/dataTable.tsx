@@ -13,8 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
-import { Trash2 } from "lucide-react";
+import { ArrowUpDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -84,7 +83,7 @@ export const columns = (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <div className="lowercase max-w-sm whitespace-nowrap text-ellipsis overflow-hidden">
+                <div className="lowercase max-w-sm lg:max-w-xl whitespace-nowrap text-ellipsis overflow-hidden">
                   {title}
                 </div>
               </TooltipTrigger>
@@ -126,26 +125,39 @@ export const columns = (
     },
     {
       accessorKey: "contentLength",
-      header: () => <div className="text-right">Characters</div>,
+      header: ({ column }) => {
+        return (
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Characters
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        );
+      },
       cell: ({ row }) => (
-        <div className="text-right font-medium">
+        <div className="text-right font-medium mr-4">
           {row.getValue("contentLength")}
         </div>
       ),
     },
     {
       accessorKey: "deleteRow",
-      header: () => null,
+      header: "",
       cell: ({ row }) => {
         return (
-          <div className="flex justify-center">
-            <Button
-              onClick={() => handleRowDelete(row.original.url)}
-              variant={"destructive"}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button
+            onClick={() => handleRowDelete(row.original.url)}
+            variant={"ghost"}
+            className="-mr-4"
+          >
+            <Trash2 className="h-6 w-4 text-red-600" />
+          </Button>
         );
       },
     },
@@ -207,7 +219,7 @@ export function DataTable({ data, setData }: Props) {
   });
 
   return (
-    <div className="w-full mx-auto max-w-5xl">
+    <div className="w-full mx-auto">
       <div className="flex items-center justify-between py-4 gap-2">
         <Input
           placeholder="Filter title..."

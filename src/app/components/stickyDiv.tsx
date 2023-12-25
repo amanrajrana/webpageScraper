@@ -1,6 +1,7 @@
 import { APIResponseType } from "@/types/type";
 import { useEffect, useState } from "react";
 import { TextContentDownloadButton } from "./textDownloadButton";
+import { Info } from "lucide-react";
 
 type Props = {
   data: APIResponseType[];
@@ -19,7 +20,7 @@ export default function StickyDiv({ data }: Props) {
   }, [data]);
 
   return (
-    <div className="bg-green-900 bg-opacity-90 md:px-4 md:py-2 rounded-md flex gap-8 items-center text-sm text-green-100 text-opacity-60 font-semibold">
+    <div className="bg-zinc-900 md:px-4 md:py-2 rounded-md flex gap-8 items-center text-sm text-green-100 text-opacity-60 font-semibold">
       <div className="hidden md:block">
         <h6>Document</h6>
         <p>
@@ -30,7 +31,10 @@ export default function StickyDiv({ data }: Props) {
         </p>
       </div>
       <div className="hidden md:block">
-        <h6>Characters</h6>
+        <h6 className="flex gap-x-1 items-center">
+          Characters
+          <Info className="h-4 w-4" />
+        </h6>
         <p>
           <span className="text-lg text-white text-opacity-100">
             {totalChar || 0}
