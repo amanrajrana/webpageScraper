@@ -1,6 +1,6 @@
 import { APIResponseType } from "@/types/type";
 import { useEffect, useState } from "react";
-import { TextContentDownloadButton } from "./textDownloadButton";
+import { StartTraining } from "./startTraining";
 import { Info } from "lucide-react";
 
 type Props = {
@@ -9,20 +9,12 @@ type Props = {
 
 export default function StickyDiv({ data }: Props) {
   const [totalChar, setTotalChar] = useState<number>(0);
-  const [fileName, setFileName] = useState<string>("");
 
   useEffect(() => {
     let total = 0;
     data?.forEach((item) => {
       if (item.contentLength) total += item.contentLength;
     });
-
-    const fileName = () => {
-      const url = new URL(data[0].url);
-      return `${url.hostname}.txt`;
-    };
-
-    setFileName(fileName);
 
     setTotalChar(total);
   }, [data]);
@@ -51,7 +43,7 @@ export default function StickyDiv({ data }: Props) {
         </p>
       </div>
       <div>
-        <TextContentDownloadButton data={data} fileName={fileName} />
+        <StartTraining data={data} />
       </div>
     </div>
   );
