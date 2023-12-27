@@ -7,6 +7,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { Loader2Icon } from "lucide-react";
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
+// Check if OPENAI_API_KEY is setup
+if (!OPENAI_API_KEY) {
+  throw new Error("NEXT_PUBLIC_OPENAI_API_KEY is not setup");
+}
+
 export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
@@ -76,13 +81,7 @@ export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
       disabled={loading}
       className="w-32 bg-black hover:bg-gray-950"
     >
-      {loading ? (
-        <>
-          <Loader2Icon className="animate-spin" />
-        </>
-      ) : (
-        "Start Training"
-      )}
+      {loading ? <Loader2Icon className="animate-spin" /> : "Start Training"}
     </Button>
   );
 };
