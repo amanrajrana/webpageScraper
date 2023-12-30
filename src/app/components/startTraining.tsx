@@ -1,16 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { APIResponseType } from "@/types/type";
+import { APIResponseType, openaiResponseType } from "@/types/type";
 import React, { useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2Icon } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
 // Check if OPENAI_API_KEY is setup
 if (!OPENAI_API_KEY) {
   throw new Error("NEXT_PUBLIC_OPENAI_API_KEY is not setup");
 }
+
+const supabase = createClient();
 
 export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
   const { toast } = useToast();
@@ -60,9 +63,11 @@ export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
 
       if (response.data) {
         toast({
-          title: "Success",
           description: "File uploaded to OpenAI successfully.",
         });
+
+        // Save Response to Supabase DB
+        handleSaveResponse(response.data);
       }
     } catch (error: AxiosError | any) {
       console.log(error);
@@ -75,6 +80,36 @@ export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
 
     setLoading(false);
   }
+
+  // Save Response to Supabase DB
+  const handleSaveResponse = async (data: openaiResponseType) => {
+    toast({
+      description: "Saving response to database.",
+    });
+    const response = await supabase.from("openaifilesinfo").insert([
+      {
+        id: data.id,
+        object: data.object,
+        purpose: data.purpose,
+        filename: data.filename,
+        bytes: data.bytes,
+        created_at: data.created_at,
+        status: data.status,
+        status_details: data.status_details,
+      },
+    ]);
+
+    console.log(response);
+
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    toast({
+      description: "Response saved to database successfully.",
+    });
+  };
+
   return (
     <Button
       onClick={handleUploadFileToOpenAI}
