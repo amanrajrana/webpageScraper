@@ -58,7 +58,6 @@ export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
         data: file,
       };
 
-      console.log("OpenAI API Key ", OPENAI_API_KEY);
       const response = await axios(axiosParams);
 
       if (response.data) {
