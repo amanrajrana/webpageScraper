@@ -66,7 +66,7 @@ export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
         });
 
         // Save Response to Supabase DB
-        handleSaveResponse(response.data);
+        await handleSaveResponse(response.data);
       }
     } catch (error: AxiosError | any) {
       console.log(error);
@@ -97,8 +97,6 @@ export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
         status_details: data.status_details,
       },
     ]);
-
-    console.log(response);
 
     if (response.error) {
       throw new Error(response.error.message);
