@@ -1,4 +1,4 @@
-export type APIResponseType = {
+export type WebScrapeDataType = {
   title: string;
   url: string;
   contentLength: number;

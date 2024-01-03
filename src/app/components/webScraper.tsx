@@ -1,12 +1,12 @@
 "use client";
-import { APIResponseType } from "@/types/type";
+import { WebScrapeDataType } from "@/types/type";
 import { useState } from "react";
 import UrlInputBox from "./urlInputBox";
 import { DataTable } from "./dataTable";
 import StickyDiv from "./stickyDiv";
 
 export default function WebScraperSection() {
-  const [data, setData] = useState<APIResponseType[]>([]);
+  const [data, setData] = useState<WebScrapeDataType[]>([]);
 
   return (
     <div className="container space-y-8">

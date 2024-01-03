@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { APIResponseType } from "@/types/type";
+import { WebScrapeDataType } from "@/types/type";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -36,7 +36,7 @@ import {
 
 export const columns = (
   handleRowDelete: Function
-): ColumnDef<APIResponseType>[] => {
+): ColumnDef<WebScrapeDataType>[] => {
   return [
     {
       id: "select",
@@ -165,8 +165,8 @@ export const columns = (
 };
 
 type Props = {
-  data: APIResponseType[];
-  setData: React.Dispatch<React.SetStateAction<APIResponseType[]>>;
+  data: WebScrapeDataType[];
+  setData: React.Dispatch<React.SetStateAction<WebScrapeDataType[]>>;
 };
 
 export function DataTable({ data, setData }: Props) {

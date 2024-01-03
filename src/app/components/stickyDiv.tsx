@@ -1,10 +1,10 @@
-import { APIResponseType } from "@/types/type";
+import { WebScrapeDataType } from "@/types/type";
 import { useEffect, useState } from "react";
 import { StartTraining } from "./startTraining";
 import { Info } from "lucide-react";
 
 type Props = {
-  data: APIResponseType[];
+  data: WebScrapeDataType[];
 };
 
 export default function StickyDiv({ data }: Props) {

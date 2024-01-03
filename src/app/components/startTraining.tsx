@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { APIResponseType, openaiResponseType } from "@/types/type";
+import { WebScrapeDataType, openaiResponseType } from "@/types/type";
 import React, { useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useToast } from "@/components/ui/use-toast";
@@ -15,7 +15,7 @@ if (!OPENAI_API_KEY) {
 
 const supabase = createClient();
 
-export const StartTraining = ({ data }: { data: APIResponseType[] }) => {
+export const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
 
