@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import UrlInputBox from "./components/urlInputBox";
 import { WebScrapeDataType } from "@/types/type";
 import { DataTable } from "./components/dataTable";
+import StickyDiv from "./components/stickyDiv";
 
 export default function WebScraperPage() {
   const [data, setData] = useState<WebScrapeDataType[]>([]);
@@ -16,7 +17,7 @@ export default function WebScraperPage() {
 
       <DataTable data={data} setData={setData} />
       <div className="fixed left-0 bottom-4 md:bottom-8 w-full flex justify-center">
-        {/* {data.length > 0 && <StickyDiv data={data} />} */}
+        {data.length > 0 && <StickyDiv data={data} />}
       </div>
     </main>
   );
