@@ -96,7 +96,7 @@ export default function UrlInputBox({ setData }: Props) {
           name="url"
           id="url"
         />
-        <Button onClick={handleClick} disabled={loading}>
+        <Button onClick={handleClick} disabled={loading || url === ""}>
           {loading ? (
             <>
               <Loader2Icon className="animate-spin" />

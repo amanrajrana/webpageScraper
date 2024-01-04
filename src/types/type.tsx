@@ -15,3 +15,9 @@ export type openaiResponseType = {
   status: string;
   status_details: string | null;
 };
+
+export type QnAType = {
+  id: number;
+  question: string;
+  answer: string;
+};
