@@ -1,13 +1,20 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus, RotateCcw, Upload } from "lucide-react";
+import { Loader2Icon, Plus, RotateCcw, Upload } from "lucide-react";
 import { useState } from "react";
 import AccordionSection from "./components/accordion";
 import { QnAType } from "@/types/type";
 import QnAInputBox from "./components/newQnAInputBox";
+import {
+  handleSaveResponseToDB,
+  handleUploadFileToOpenAI,
+} from "@/lib/handleUploadFile";
+import { toast } from "@/components/ui/use-toast";
 
+/* The code is defining a React functional component called `QuestionAndAnswerPage`. */
 export default function QuestionAndAnswerPage() {
+  const [loading, setLoading] = useState<boolean>(false);
   const [qAndA, setQAndA] = useState<QnAType[]>([]);
   const [QnABoxVisible, setQnABoxVisible] = useState<boolean>(false);
   const [newQnA, setNewQAndA] = useState<QnAType>({
@@ -25,6 +32,50 @@ export default function QuestionAndAnswerPage() {
 
     // hide input box
     setQnABoxVisible(false);
+  };
+
+  const handleUpload = async () => {
+    setLoading(true);
+    try {
+      const txtFileContent = qAndA
+        .map(
+          (item) =>
+            "Question: " + item.question + "\n" + "Answer: " + item.answer
+        )
+        .join("\n\n\n\n");
+
+      // create a file from txtFileContent
+      const file = new Blob([txtFileContent], { type: "text/plain" });
+
+      // create a file name
+      const fileName = `qna-${new Date().toISOString()}.txt`;
+
+      // upload file to openai
+      const response = await handleUploadFileToOpenAI(file, fileName);
+
+      if (response.data) {
+        toast({
+          description: "File uploaded to OpenAI successfully.",
+        });
+      }
+
+      // Save Response to Supabase DB
+      toast({
+        description: "Saving response to Supabase DB...",
+      });
+
+      await handleSaveResponseToDB(response.data);
+    } catch (error: any) {
+      toast({
+        title: error?.code || "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+
+    setLoading(false);
+
+    setQAndA([]);
   };
 
   return (
@@ -47,7 +98,7 @@ export default function QuestionAndAnswerPage() {
                 className="w-full sm:w-max"
                 onClick={() => setQnABoxVisible(true)}
               >
-                <Plus className="mr-1" size={16} /> Add QnA
+                <Plus className="mr-1" size={16} /> Add Q&A
               </Button>
             </div>
           )}
@@ -55,14 +106,24 @@ export default function QuestionAndAnswerPage() {
       </div>
       <div className="flex justify-end gap-2 flex-wrap-reverse my-4">
         <Button
-          disabled={qAndA.length <= 0}
+          disabled={qAndA.length <= 0 || loading}
           className="w-full gap-1 sm:w-24"
           variant={"outline"}
         >
           <RotateCcw size={16} /> Reset
         </Button>
-        <Button disabled={qAndA.length <= 0} className="w-full gap-1 sm:w-24">
-          <Upload size={16} /> Upload
+        <Button
+          disabled={qAndA.length <= 0 || loading}
+          className="w-full gap-1 sm:w-24"
+          onClick={handleUpload}
+        >
+          {loading ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <>
+              <Upload size={16} /> Upload
+            </>
+          )}
         </Button>
       </div>
     </main>

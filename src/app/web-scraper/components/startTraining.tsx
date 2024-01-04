@@ -1,25 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { WebScrapeDataType, openaiResponseType } from "@/types/type";
-import React, { useState } from "react";
-import axios, { AxiosError } from "axios";
+import { WebScrapeDataType } from "@/types/type";
+import React, { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2Icon } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
-const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+import { Info, Loader2Icon } from "lucide-react";
+import {
+  handleSaveResponseToDB,
+  handleUploadFileToOpenAI,
+} from "@/lib/handleUploadFile";
 
-// Check if OPENAI_API_KEY is setup
-if (!OPENAI_API_KEY) {
-  throw new Error("NEXT_PUBLIC_OPENAI_API_KEY is not setup");
-}
-
-const supabase = createClient();
-
-export const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
+const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
+  const [totalChar, setTotalChar] = useState<number>(0);
 
-  async function handleUploadFileToOpenAI() {
+  async function handleButtonUpload() {
     if (data.length === 0) {
       toast({
         title: "File is empty",
@@ -38,37 +33,27 @@ export const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
       .map((item) => "Title: " + item.title + "\n\n" + item.content)
       .join("\n\n\n\n");
 
+    const file = new Blob([txtFileContent], { type: "text/plain" });
+
     try {
-      const file = new FormData();
-
-      file.append("purpose", "assistants");
-      file.append(
-        "file",
-        new Blob([txtFileContent], { type: "text/plain" }),
-        `${url.hostname}.txt`
+      const response = await handleUploadFileToOpenAI(
+        file,
+        url.hostname + ".txt"
       );
-
-      const axiosParams = {
-        method: "POST",
-        url: "https://api.openai.com/v1/files",
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-        },
-        data: file,
-      };
-
-      const response = await axios(axiosParams);
 
       if (response.data) {
         toast({
           description: "File uploaded to OpenAI successfully.",
         });
 
+        toast({
+          description: "Saving response to Supabase DB...",
+        });
+
         // Save Response to Supabase DB
-        await handleSaveResponse(response.data);
+        await handleSaveResponseToDB(response.data);
       }
-    } catch (error: AxiosError | any) {
+    } catch (error: any) {
       console.log(error);
       toast({
         title: error?.code || "Error",
@@ -80,40 +65,53 @@ export const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
     setLoading(false);
   }
 
-  // Save Response to Supabase DB
-  const handleSaveResponse = async (data: openaiResponseType) => {
-    toast({
-      description: "Saving response to database.",
+  useEffect(() => {
+    let total = 0;
+    data?.forEach((item) => {
+      if (item.contentLength) total += item.contentLength;
     });
-    const response = await supabase.from("openaifilesinfo").insert([
-      {
-        id: data.id,
-        object: data.object,
-        purpose: data.purpose,
-        filename: data.filename,
-        bytes: data.bytes,
-        created_at: data.created_at,
-        status: data.status,
-        status_details: data.status_details,
-      },
-    ]);
 
-    if (response.error) {
-      throw new Error(response.error.message);
-    }
-
-    toast({
-      description: "Response saved to database successfully.",
-    });
-  };
+    setTotalChar(total);
+  }, [data]);
 
   return (
-    <Button
-      onClick={handleUploadFileToOpenAI}
-      disabled={loading}
-      className="w-32 bg-black hover:bg-gray-950"
-    >
-      {loading ? <Loader2Icon className="animate-spin" /> : "Start Training"}
-    </Button>
+    <div className="bg-zinc-900 md:px-4 md:py-2 rounded-md flex gap-8 items-center text-sm text-green-100 text-opacity-60 font-semibold">
+      <div className="hidden md:block">
+        <h6>Document</h6>
+        <p>
+          <span className="text-lg text-white text-opacity-100">
+            {data?.length || 0}
+          </span>{" "}
+          Links
+        </p>
+      </div>
+      <div className="hidden md:block">
+        <h6 className="flex gap-x-1 items-center">
+          Characters
+          <Info className="h-4 w-4" />
+        </h6>
+        <p>
+          <span className="text-lg text-white text-opacity-100">
+            {totalChar || 0}
+          </span>{" "}
+          chars
+        </p>
+      </div>
+      <div>
+        <Button
+          onClick={handleButtonUpload}
+          disabled={loading}
+          className="w-32 bg-black hover:bg-gray-950"
+        >
+          {loading ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            "Start Training"
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };
+
+export default StartTraining;

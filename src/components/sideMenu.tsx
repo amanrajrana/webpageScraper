@@ -47,10 +47,12 @@ export default function SideMenu() {
     <div
       className={`${
         isMenuOpen ? "" : "translate-x-[calc(-100%+24px)]"
-      } duration-300 lg:translate-x-0 flex z-10`}
+      } duration-300 lg:translate-x-0 flex z-10 absolute lg:static`}
     >
       <div
-        className={`bg-white lg:static lg:block w-56 ml-2 px-6 pt-32 h-screen min-h-max overflow-y-auto border-r `}
+        className={`bg-white ${
+          isMenuOpen ? "" : "hidden"
+        } lg:static lg:block w-56 ml-2 px-6 pt-32 h-screen min-h-max overflow-y-auto border-r `}
       >
         <nav className="w-full">
           <ul className="w-full flex flex-col gap-y-4">
