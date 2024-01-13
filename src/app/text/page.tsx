@@ -3,10 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  handleSaveResponseToDB,
-  handleUploadFileToOpenAI,
-} from "@/lib/handleUploadFile";
+import { handleUploadText } from "@/lib/handleTextUpload";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 
@@ -21,22 +18,7 @@ export default function TextUploadPage() {
     setLoading(true);
 
     try {
-      const fileName = `text-${new Date().toISOString()}.txt`;
-
-      const response = await handleUploadFileToOpenAI(data, fileName);
-
-      if (response.data) {
-        toast({
-          description: "File uploaded to OpenAI successfully.",
-        });
-      }
-
-      // Save Response to Supabase DB
-      toast({
-        description: "Saving response to Supabase DB...",
-      });
-
-      await handleSaveResponseToDB(response.data);
+      await handleUploadText(text);
     } catch (error: any) {
       toast({
         title: error?.code || "Error",

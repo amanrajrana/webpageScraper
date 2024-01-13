@@ -14,6 +14,8 @@ npm install
 
 We use Supabase as our database. To set it up, you need to create a table named `openaifilesInfo`. Here's the SQL command to create the table:
 
+**Table `openaiFilesInfo`**
+
 ```sql
 CREATE TABLE openaifilesInfo (
   db_id SERIAL PRIMARY KEY,
@@ -27,7 +29,18 @@ CREATE TABLE openaifilesInfo (
   created_at INTEGER
 );
 
-````
+```
+
+**Table `userUploadedFiles**
+```sql
+CREATE TABLE userUploadedFiles (
+  id SERIAL PRIMARY KEY,
+  fileData TEXT,
+  fileType TEXT,
+  filename TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
 
 This table will store information about the files you interact with using the OpenAI API.
 

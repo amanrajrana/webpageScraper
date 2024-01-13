@@ -11,6 +11,7 @@ import {
   handleUploadFileToOpenAI,
 } from "@/lib/handleUploadFile";
 import { toast } from "@/components/ui/use-toast";
+import { handleUploadText } from "@/lib/handleTextUpload";
 
 /* The code is defining a React functional component called `QuestionAndAnswerPage`. */
 export default function QuestionAndAnswerPage() {
@@ -44,27 +45,7 @@ export default function QuestionAndAnswerPage() {
         )
         .join("\n\n\n\n");
 
-      // create a file from txtFileContent
-      const file = new Blob([txtFileContent], { type: "text/plain" });
-
-      // create a file name
-      const fileName = `qna-${new Date().toISOString()}.txt`;
-
-      // upload file to openai
-      const response = await handleUploadFileToOpenAI(file, fileName);
-
-      if (response.data) {
-        toast({
-          description: "File uploaded to OpenAI successfully.",
-        });
-      }
-
-      // Save Response to Supabase DB
-      toast({
-        description: "Saving response to Supabase DB...",
-      });
-
-      await handleSaveResponseToDB(response.data);
+      await handleUploadText(txtFileContent);
     } catch (error: any) {
       toast({
         title: error?.code || "Error",
