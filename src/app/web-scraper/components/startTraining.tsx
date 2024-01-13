@@ -41,16 +41,8 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
         url.hostname + ".txt"
       );
 
+      // Save Response to Supabase DB
       if (response.data) {
-        toast({
-          description: "File uploaded to OpenAI successfully.",
-        });
-
-        toast({
-          description: "Saving response to Supabase DB...",
-        });
-
-        // Save Response to Supabase DB
         await handleSaveResponseToDB(response.data);
       }
     } catch (error: any) {
