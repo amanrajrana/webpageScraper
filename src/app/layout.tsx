@@ -19,9 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className + " flex h-screen overflow-hidden"}>
-        <SideMenu />
-        <div className="flex-1 w-full overflow-y-auto">{children}</div>
-        <Toaster />
+        {children}
       </body>
     </html>
   );
