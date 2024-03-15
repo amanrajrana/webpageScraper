@@ -17,29 +17,38 @@ We use Supabase as our database. To set it up, you need to create a table named 
 **Table `openaiFilesInfo`**
 
 ```sql
-CREATE TABLE openaifilesInfo (
-  db_id SERIAL PRIMARY KEY,
-  object TEXT,
-  id TEXT UNIQUE NOT NULL,
-  purpose TEXT,
-  filename TEXT,
-  bytes INT,
-  status TEXT,
-  status_details TEXT,
-  created_at INTEGER
-);
+CREATE TABLE
+  public.openaifilesInfo (
+    db_id SERIAL PRIMARY KEY,
+    object TEXT,
+    id TEXT UNIQUE NOT NULL,
+    purpose TEXT,
+    filename TEXT,
+    bytes INT,
+    status TEXT,
+    status_details TEXT,
+    created_at INTEGER,
+    user_id uuid NOT NULL,
+    file_id int,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES auth.users (id) on delete RESTRICT,
+    CONSTRAINT fk_uploadedFile FOREIGN KEY (file_id) REFERENCES public.useruploadedfiles (id) on delete RESTRICT
+  );
 
 ```
 
-**Table `userUploadedFiles**
+**Table `userUploadedFiles`**
 ```sql
-CREATE TABLE userUploadedFiles (
-  id SERIAL PRIMARY KEY,
-  fileData TEXT,
-  fileType TEXT,
-  filename TEXT,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+CREATE TABLE
+  public.userUploadedFiles (
+    id SERIAL PRIMARY KEY NOT NULL,
+    fileData TEXT NOT NULL,
+    fileType TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    user_id uuid NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES auth.users (id) on delete RESTRICT
+  );
+
 ```
 
 This table will store information about the files you interact with using the OpenAI API.
