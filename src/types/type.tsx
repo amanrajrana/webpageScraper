@@ -21,3 +21,9 @@ export type QnAType = {
   question: string;
   answer: string;
 };
+
+export type User = {
+  id: string;
+  email: string;
+  name?: string;
+};

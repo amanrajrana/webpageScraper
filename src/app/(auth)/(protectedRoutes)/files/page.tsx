@@ -1,25 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import FileInputBox from "./components/fileInputBox";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import {
-  handleSaveFileDataToDB,
   handleSaveResponseToDB,
   handleUploadFileToOpenAI,
-} from "@/lib/handleUploadFile";
+} from "@/lib/uploadFileToOpenAI";
+import { handleSaveFileDataToDB } from "@/lib/handleSaveFileInDB";
+import UserContext from "@/context/user/userContext";
 
 export default function FileUploadPage() {
+  const { user } = useContext(UserContext);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // Function to reset the selected file
   const handleReset = () => {
     toast({ description: "File reset" });
     setSelectedFile(null);
   };
 
+  // Function to convert file to base64
   const getFileAsBase64 = async (file: File) => {
     const reader = new FileReader();
     return new Promise<string>((resolve, reject) => {
@@ -39,6 +44,7 @@ export default function FileUploadPage() {
     });
   };
 
+  // Function to handle file submission
   const handleSubmission = async () => {
     console.log("Submitting file");
     if (!selectedFile) return;
@@ -55,12 +61,21 @@ export default function FileUploadPage() {
       // Uploading file to OpenAI
       const data = new Blob([selectedFile], { type: selectedFile.type });
 
+      if (!user) throw new Error("Unauthorized user. Please login.");
+
       const [response] = await Promise.all([
         handleUploadFileToOpenAI(data, fileName),
-        handleSaveFileDataToDB(fileData, fileType, fileName),
+
+        // handleSaveFileDataToDB(fileData, fileType, fileName),
+        handleSaveFileDataToDB({
+          fileData,
+          fileType,
+          fileName,
+          userId: user.id,
+        }),
       ]);
 
-      await handleSaveResponseToDB(response.data);
+      // await handleSaveResponseToDB(response.data);
     } catch (error: SuppressedError | any) {
       toast({
         title: error?.status || "Error",

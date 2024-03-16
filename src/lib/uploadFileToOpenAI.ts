@@ -40,7 +40,12 @@ export async function handleUploadFileToOpenAI(data: Blob, fileName: string) {
 }
 
 // Save Response to Supabase DB
-export const handleSaveResponseToDB = async (data: openaiResponseType) => {
+type Props = openaiResponseType & {
+  user_id: string;
+  file_id: number;
+};
+
+export const handleSaveResponseToDB = async (data: Props) => {
   toast({
     description: "Saving response to database.",
   });
@@ -59,29 +64,6 @@ export const handleSaveResponseToDB = async (data: openaiResponseType) => {
 
   if (response.error) {
     throw new Error(response.error.message);
-  }
-
-  toast({
-    description: "Response saved to database successfully.",
-  });
-};
-
-// Save fileData to Supabase DB
-export const handleSaveFileDataToDB = async (
-  fileData: string,
-  fileType: string,
-  fileName: string
-) => {
-  toast({
-    description: "Saving file to database.",
-  });
-
-  const response = await supabase
-    .from("useruploadedfiles")
-    .insert([{ filedata: fileData, filetype: fileType, filename: fileName }]);
-
-  if (response.error) {
-    throw new Error(response.error.message || "Error saving file to database.");
   }
 
   toast({

@@ -7,7 +7,7 @@ import { Info, Loader2Icon } from "lucide-react";
 import {
   handleSaveResponseToDB,
   handleUploadFileToOpenAI,
-} from "@/lib/handleUploadFile";
+} from "@/lib/uploadFileToOpenAI";
 
 const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
   const { toast } = useToast();
