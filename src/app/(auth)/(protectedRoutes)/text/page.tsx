@@ -1,24 +1,38 @@
 "use client";
 
+import { FileNameModal } from "@/components/fileNameModal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { handleUploadText } from "@/lib/handleTextUpload";
+import UserContext from "@/context/user/userContext";
+import { handleUploadText } from "@/lib/textUpload";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 
 export default function TextUploadPage() {
   const { toast } = useToast();
+  const { user } = useContext(UserContext);
+
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleUpload = async () => {
-    const data = new Blob([text], { type: "text/plain" });
-
     setLoading(true);
 
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Unauthorized user",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
-      await handleUploadText(text);
+      await handleUploadText({ text, user_id: user.id });
     } catch (error: any) {
       toast({
         title: error?.code || "Error",
@@ -56,8 +70,8 @@ export default function TextUploadPage() {
           <RotateCcw size={16} /> Reset
         </Button>
         <Button
-          onClick={handleUpload}
-          disabled={text === "" || loading}
+          onClick={(e) => setOpen(true)}
+          disabled={!text || loading}
           className="w-full gap-1 sm:w-24"
         >
           {loading ? (
@@ -69,6 +83,13 @@ export default function TextUploadPage() {
           )}
         </Button>
       </div>
+      <FileNameModal
+        open={open}
+        setOpen={setOpen}
+        fileName={fileName}
+        setFileName={setFileName}
+        cb={handleUpload}
+      />
     </main>
   );
 }

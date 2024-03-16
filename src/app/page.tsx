@@ -1,17 +1,19 @@
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function Home() {
+const Home = () => {
   return (
-    <main className="pb-32">
-      <h1 className="text-2xl text-white">Hello World</h1>
-      <ul className="flex flex-col justify-center items-center w-full">
-        <li>
-          <Link href={"/website"}>website</Link>
-        </li>
-        <li>
-          <Link href={"/files"}>Files</Link>
-        </li>
-      </ul>
-    </main>
+    <div className="w-full h-full flex justify-center items-center">
+      <div className="flex gap-2">
+        <Button variant={"outline"}>
+          <Link href={"/signup"}>Sign Up</Link>
+        </Button>
+        <Button>
+          <Link href={"/login"}>Login</Link>
+        </Button>
+      </div>
+    </div>
   );
-}
+};
+
+export default Home;

@@ -2,19 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Loader2Icon, Plus, RotateCcw, Upload } from "lucide-react";
-import { useState } from "react";
+import { use, useContext, useState } from "react";
 import AccordionSection from "./components/accordion";
 import { QnAType } from "@/types/type";
 import QnAInputBox from "./components/newQnAInputBox";
-import {
-  handleSaveResponseToDB,
-  handleUploadFileToOpenAI,
-} from "@/lib/handleUploadFile";
 import { toast } from "@/components/ui/use-toast";
-import { handleUploadText } from "@/lib/handleTextUpload";
+import { handleUploadText } from "@/lib/textUpload";
+import UserContext from "@/context/user/userContext";
 
 /* The code is defining a React functional component called `QuestionAndAnswerPage`. */
 export default function QuestionAndAnswerPage() {
+  const { user } = useContext(UserContext);
+
   const [loading, setLoading] = useState<boolean>(false);
   const [qAndA, setQAndA] = useState<QnAType[]>([]);
   const [QnABoxVisible, setQnABoxVisible] = useState<boolean>(false);
@@ -45,7 +44,12 @@ export default function QuestionAndAnswerPage() {
         )
         .join("\n\n\n\n");
 
-      await handleUploadText(txtFileContent);
+      if (!user) throw new Error("Unauthorized user. Please login.");
+
+      await handleUploadText({
+        text: txtFileContent,
+        user_id: user.id,
+      });
     } catch (error: any) {
       toast({
         title: error?.code || "Error",
