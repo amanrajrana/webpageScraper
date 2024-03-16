@@ -1,15 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { WebScrapeDataType } from "@/types/type";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Info, Loader2Icon } from "lucide-react";
+import { Info, Loader2Icon, Upload } from "lucide-react";
 import {
   handleSaveResponseToDB,
   handleUploadFileToOpenAI,
 } from "@/lib/uploadFileToOpenAI";
+import { handleSaveFileDataToDB } from "@/lib/handleSaveFileInDB";
+import UserContext from "@/context/user/userContext";
 
 const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
+  const { user } = useContext(UserContext);
+
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [totalChar, setTotalChar] = useState<number>(0);
@@ -36,15 +40,20 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
     const file = new Blob([txtFileContent], { type: "text/plain" });
 
     try {
-      const response = await handleUploadFileToOpenAI(
-        file,
-        url.hostname + ".txt"
-      );
+      if (!user) throw new Error("Unauthorized user. Please login.");
 
-      // Save Response to Supabase DB
-      if (response.data) {
-        await handleSaveResponseToDB(response.data);
-      }
+      const fileName = url.hostname;
+      const [response, file_id] = await Promise.all([
+        handleUploadFileToOpenAI(file, fileName),
+        handleSaveFileDataToDB({
+          fileData: fileName,
+          fileType: "url",
+          fileName: fileName,
+          userId: user.id,
+        }),
+      ]);
+
+      await handleSaveResponseToDB({ ...response, user_id: user.id, file_id });
     } catch (error: any) {
       console.log(error);
       toast({
@@ -98,7 +107,10 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
           {loading ? (
             <Loader2Icon className="animate-spin" />
           ) : (
-            "Start Training"
+            <div className="flex justify-center items-center gap-2">
+              <Upload size={16} />
+              Upload
+            </div>
           )}
         </Button>
       </div>

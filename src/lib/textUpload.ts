@@ -6,22 +6,22 @@ import {
 
 type Props = {
   text: string;
-  name?: string;
+  fileName: string;
   user_id: string;
 };
 
 export const handleUploadText = async (props: Props) => {
-  const { text, name, user_id } = props;
+  console.log("Uploading text");
+
+  const { text, fileName, user_id } = props;
 
   if (!text) {
     throw new Error("No text to upload.");
   }
 
-  const fileName = name || `text-${new Date().toISOString()}.txt`;
-
   const data = new Blob([text], { type: "text/plain" });
 
-  const [response] = await Promise.all([
+  const [response, file_id] = await Promise.all([
     handleUploadFileToOpenAI(data, fileName),
     handleSaveFileDataToDB({
       fileData: text,
@@ -32,5 +32,5 @@ export const handleUploadText = async (props: Props) => {
   ]);
 
   // Save Response to Supabase DB
-  // await handleSaveResponseToDB(response.data);
+  await handleSaveResponseToDB({ ...response, user_id, file_id });
 };

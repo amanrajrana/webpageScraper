@@ -29,7 +29,7 @@ CREATE TABLE
     status_details TEXT,
     created_at INTEGER,
     user_id uuid NOT NULL,
-    file_id int,
+    file_id int NOT NULL,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES auth.users (id) on delete RESTRICT,
     CONSTRAINT fk_uploadedFile FOREIGN KEY (file_id) REFERENCES public.useruploadedfiles (id) on delete RESTRICT
   );
@@ -37,6 +37,7 @@ CREATE TABLE
 ```
 
 **Table `userUploadedFiles`**
+
 ```sql
 CREATE TABLE
   public.userUploadedFiles (

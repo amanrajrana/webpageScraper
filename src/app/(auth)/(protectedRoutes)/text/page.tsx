@@ -32,7 +32,7 @@ export default function TextUploadPage() {
     }
 
     try {
-      await handleUploadText({ text, user_id: user.id });
+      await handleUploadText({ text, user_id: user.id, fileName });
     } catch (error: any) {
       toast({
         title: error?.code || "Error",

@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosResponse } from "axios";
+import axios from "axios";
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 import { createClient } from "@/utils/supabase/client";
 import { openaiResponseType } from "@/types/type";
@@ -36,7 +36,7 @@ export async function handleUploadFileToOpenAI(data: Blob, fileName: string) {
     description: "File uploaded to OpenAI successfully.",
   });
 
-  return response as AxiosResponse<openaiResponseType>;
+  return response.data as openaiResponseType;
 }
 
 // Save Response to Supabase DB
@@ -59,6 +59,8 @@ export const handleSaveResponseToDB = async (data: Props) => {
       created_at: data.created_at,
       status: data.status,
       status_details: data.status_details,
+      user_id: data.user_id,
+      file_id: data.file_id,
     },
   ]);
 

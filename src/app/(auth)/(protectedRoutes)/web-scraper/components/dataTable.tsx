@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * The `DataTable` component is used to display the data in a table format.
+ */
+
 import * as React from "react";
 import {
   ColumnDef,

@@ -26,6 +26,11 @@ export function FileNameModal({
   setFileName,
   cb,
 }: Props) {
+  const handleClicked = () => {
+    setOpen(false);
+    cb();
+  };
+
   return (
     <AlertDialog open={open}>
       <AlertDialogContent>
@@ -45,7 +50,7 @@ export function FileNameModal({
           <AlertDialogCancel onClick={() => setOpen(false)}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction disabled={!fileName} onClick={cb}>
+          <AlertDialogAction disabled={!fileName} onClick={handleClicked}>
             Upload
           </AlertDialogAction>
         </AlertDialogFooter>

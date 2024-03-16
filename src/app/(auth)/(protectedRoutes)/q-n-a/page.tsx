@@ -9,11 +9,14 @@ import QnAInputBox from "./components/newQnAInputBox";
 import { toast } from "@/components/ui/use-toast";
 import { handleUploadText } from "@/lib/textUpload";
 import UserContext from "@/context/user/userContext";
+import { FileNameModal } from "@/components/fileNameModal";
 
 /* The code is defining a React functional component called `QuestionAndAnswerPage`. */
 export default function QuestionAndAnswerPage() {
   const { user } = useContext(UserContext);
 
+  const [fileName, setFileName] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [qAndA, setQAndA] = useState<QnAType[]>([]);
   const [QnABoxVisible, setQnABoxVisible] = useState<boolean>(false);
@@ -49,6 +52,7 @@ export default function QuestionAndAnswerPage() {
       await handleUploadText({
         text: txtFileContent,
         user_id: user.id,
+        fileName,
       });
     } catch (error: any) {
       toast({
@@ -100,7 +104,7 @@ export default function QuestionAndAnswerPage() {
         <Button
           disabled={qAndA.length <= 0 || loading}
           className="w-full gap-1 sm:w-24"
-          onClick={handleUpload}
+          onClick={(e) => setOpen(true)}
         >
           {loading ? (
             <Loader2Icon className="animate-spin" />
@@ -111,6 +115,13 @@ export default function QuestionAndAnswerPage() {
           )}
         </Button>
       </div>
+      <FileNameModal
+        fileName={fileName}
+        setFileName={setFileName}
+        open={open}
+        setOpen={setOpen}
+        cb={handleUpload}
+      ></FileNameModal>
     </main>
   );
 }
