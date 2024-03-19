@@ -4,6 +4,7 @@ import {
   ChevronRight,
   File,
   Globe,
+  LayoutDashboard,
   LogOut,
   MessagesSquare,
 } from "lucide-react";
@@ -19,6 +20,11 @@ export default function SideMenu() {
   const router = useRouter();
 
   const NAV_ITEMS = [
+    {
+      name: "Dashboard",
+      icon: <LayoutDashboard />,
+      path: "/dashboard",
+    },
     {
       name: "Files",
       icon: <File />,

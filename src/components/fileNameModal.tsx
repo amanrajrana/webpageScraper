@@ -42,7 +42,7 @@ export function FileNameModal({
               id="file-name"
               type="text"
               value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
+              onChange={(e) => setFileName(e.target.value.toLowerCase())}
             />
           </AlertDialogDescription>
         </AlertDialogHeader>

@@ -27,3 +27,28 @@ export type User = {
   email: string;
   name?: string;
 };
+
+export type Data = {
+  id: number;
+  fileName: string;
+  type: string;
+  time: string;
+};
+
+export type UserCredential = {
+  email: string;
+  password: string;
+  redirectTo?: string;
+};
+
+export type FileMetaData = {
+  bytes: number;
+  db_id: number;
+  file_id: number;
+  filename: string;
+  id: string;
+  purpose: string;
+  status: string;
+  created_at: string;
+  filetype: string;
+};

@@ -2,10 +2,10 @@
 
 import UserContext from "@/context/user/userContext";
 import { useContext, useEffect } from "react";
-import styles from "./styles.module.css";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import SideMenu from "@/components/sideMenu";
+import LoadingSpinner from "@/components/loadingSpinner";
 
 export default function CheckAuth({ children }: { children: React.ReactNode }) {
   const { user, loadingUserSession } = useContext(UserContext);
@@ -18,10 +18,7 @@ export default function CheckAuth({ children }: { children: React.ReactNode }) {
   if (loadingUserSession) {
     return (
       <div className="w-full h-screen flex justify-center items-center">
-        <div className="flex flex-col justify-center items-center gap-2">
-          <div className={styles.loader}></div>
-          <p>Loading...</p>
-        </div>
+        <LoadingSpinner />
       </div>
     );
   }
