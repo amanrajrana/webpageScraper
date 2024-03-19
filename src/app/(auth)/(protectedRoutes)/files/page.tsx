@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useState } from "react";
-import FileInputBox from "./components/fileInputBox";
+import FileInputBox from "./fileInputBox";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
@@ -60,23 +60,21 @@ export default function FileUploadPage() {
 
       if (!user) throw new Error("Unauthorized user. Please login.");
 
-      const [response, id] = await Promise.all([
-        handleUploadFileToOpenAI(data, fileName),
-        fileService.uploadFile({
-          fileData,
-          fileType,
-          fileName,
-          userId: user.id,
-        }),
-      ]);
+      const openaiResponse = await handleUploadFileToOpenAI(data, fileName);
+      const fileId = await fileService.uploadFile({
+        fileData,
+        fileType,
+        fileName,
+        userId: user.id,
+      });
 
       toast({
-        description: "File uploaded to OpenAI & Database successfully.",
+        description: "File uploaded to OpenAI Database successfully.",
       });
 
       await fileService.saveResponseToDB({
-        ...response,
-        file_id: id,
+        ...openaiResponse,
+        file_id: fileId,
         user_id: user.id,
       });
     } catch (error: SuppressedError | any) {
