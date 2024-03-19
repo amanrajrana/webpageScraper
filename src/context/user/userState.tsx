@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import UserContext from "./userContext";
 import { User } from "@/types/type";
-import supabase from "@/utils/supabase/supabase";
+import authService from "@/utils/supabase/authServices";
 
 const UserState = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -13,7 +13,7 @@ const UserState = ({ children }: { children: React.ReactNode }) => {
     console.log("UserState useEffect");
     setLoadingUserSession(true);
 
-    supabase.auth
+    authService
       .getUser()
       .then(({ data, error }) => {
         if (error) {

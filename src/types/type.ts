@@ -52,3 +52,15 @@ export type FileMetaData = {
   created_at: string;
   filetype: string;
 };
+
+export type FileData = {
+  fileData: string;
+  fileType: string;
+  fileName: string;
+  userId: string;
+};
+
+export type SaveResponseToDB = openaiResponseType & {
+  user_id: string;
+  file_id: number;
+};

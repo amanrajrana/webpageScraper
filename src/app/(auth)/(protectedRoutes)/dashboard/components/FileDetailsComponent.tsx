@@ -69,7 +69,7 @@ function FileDetailsComponent({ fileData }: Props) {
             Size
           </span>
           <span className="flex-1 flex gap-x-1.5 items-center">
-            {fileData.bytes}
+            {fileData.bytes} bytes
           </span>
         </div>
         <div className="flex w-full py-1">

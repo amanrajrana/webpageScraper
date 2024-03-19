@@ -12,7 +12,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import supabase from "@/utils/supabase/supabase";
+import authService from "@/utils/supabase/authServices";
 
 export default function SideMenu() {
   const pathName = usePathname();
@@ -57,7 +57,7 @@ export default function SideMenu() {
 
     if (!action) return;
 
-    const { error } = await supabase.auth.signOut();
+    const { error } = await authService.signOut();
 
     if (error) {
       alert(error?.message);

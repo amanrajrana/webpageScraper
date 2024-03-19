@@ -4,12 +4,9 @@ import { WebScrapeDataType } from "@/types/type";
 import React, { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Info, Loader2Icon, Upload } from "lucide-react";
-import {
-  handleSaveResponseToDB,
-  handleUploadFileToOpenAI,
-} from "@/lib/uploadFileToOpenAI";
-import { handleSaveFileDataToDB } from "@/lib/handleSaveFileInDB";
 import UserContext from "@/context/user/userContext";
+import { handleUploadFileToOpenAI } from "@/utils/openai/fileUpload";
+import fileService from "@/utils/supabase/fileServices";
 
 const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
   const { user } = useContext(UserContext);
@@ -45,7 +42,7 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
       const fileName = url.hostname;
       const [response, file_id] = await Promise.all([
         handleUploadFileToOpenAI(file, fileName),
-        handleSaveFileDataToDB({
+        fileService.uploadFile({
           fileData: fileName,
           fileType: "url",
           fileName: fileName,
@@ -53,7 +50,11 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
         }),
       ]);
 
-      await handleSaveResponseToDB({ ...response, user_id: user.id, file_id });
+      await fileService.saveResponseToDB({
+        ...response,
+        user_id: user.id,
+        file_id,
+      });
     } catch (error: any) {
       console.log(error);
       toast({

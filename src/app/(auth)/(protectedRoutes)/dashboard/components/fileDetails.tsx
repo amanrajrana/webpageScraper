@@ -1,10 +1,10 @@
 import { useToast } from "@/components/ui/use-toast";
 import UserContext from "@/context/user/userContext";
 import { FileMetaData } from "@/types/type";
-import supabase from "@/utils/supabase/supabase";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import FileDetailsComponent from "./FileDetailsComponent";
 import { Loader } from "lucide-react";
+import fileService from "@/utils/supabase/fileServices";
 
 const FileDetailsArea = ({ id }: any) => {
   const { user } = useContext(UserContext);
@@ -30,13 +30,10 @@ const FileDetailsArea = ({ id }: any) => {
     }
 
     // Fetch data from supabase
-    const { data, error }: { data: any; error: any } = await supabase
-      .from("openaifilesinfo")
-      .select(
-        "db_id, id, purpose, filename, bytes, status, file_id, useruploadedfiles(filetype, created_at)"
-      )
-      .eq("file_id", id)
-      .filter("user_id", "eq", user.id);
+    const { data, error } = await fileService.getFileDetailsById({
+      fileId: id,
+      userId: user.id,
+    });
 
     if (error) {
       toast({
@@ -45,26 +42,17 @@ const FileDetailsArea = ({ id }: any) => {
         variant: "destructive",
       });
 
+      setFileData(undefined);
       setLoading(false);
       return;
     }
 
-    if (data.length < 1) {
+    if (!data) {
       setLoading(false);
       return;
     }
 
-    setFileData({
-      bytes: data[0].bytes,
-      created_at: data[0].useruploadedfiles.created_at,
-      db_id: data[0].db_id,
-      file_id: data[0].file_id,
-      filename: data[0].filename,
-      filetype: data[0].useruploadedfiles.filetype,
-      id: data[0].id,
-      purpose: data[0].purpose,
-      status: data[0].status,
-    });
+    setFileData(data);
 
     setLoading(false);
   }, [id, user, toast]);

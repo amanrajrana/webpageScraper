@@ -1,6 +1,6 @@
 "use client";
 
-import supabase from "@/utils/supabase/supabase";
+import authService from "@/utils/supabase/authServices";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,7 +16,6 @@ import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UserContext from "@/context/user/userContext";
-import { useToast } from "@/components/ui/use-toast";
 
 type message = {
   type: "success" | "error";
@@ -45,7 +44,7 @@ const LogIn = () => {
     setMessage(null); // Reset message state
     setLoading(true); // Set loading state
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await authService.signInWithEmail({
       email: email,
       password: password,
     });

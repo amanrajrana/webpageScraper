@@ -6,11 +6,11 @@ import FileListArea from "./components/fileList";
 import FileDetailsArea from "./components/fileDetails";
 import UserContext from "@/context/user/userContext";
 import { useToast } from "@/components/ui/use-toast";
-import supabase from "@/utils/supabase/supabase";
 import { Data } from "@/types/type";
 import FileMetaDataState from "@/context/fileData/fileDataState";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import fileService from "@/utils/supabase/fileServices";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -22,13 +22,7 @@ const Dashboard = () => {
   const [id, setId] = useState<number>(0);
   const [toggle, setToggle] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log("id", id);
-  }, [id]);
-
   const fetchedData = useCallback(() => {
-    console.log("fetching data");
-
     if (!user) {
       toast({
         title: "Error",
@@ -42,11 +36,12 @@ const Dashboard = () => {
     const reFormatedSortBy = sortBy === "Date" ? "created_at" : "filename";
 
     // Fetch data from supabase
-    supabase
-      .from("useruploadedfiles")
-      .select("id, filetype, filename, created_at")
-      .eq("user_id", `${user.id}`)
-      .order(`${reFormatedSortBy}`, { ascending })
+    fileService
+      .getFilesByUserId({
+        userId: user.id,
+        orderBy: reFormatedSortBy,
+        ascending,
+      })
       .then(({ data, error }) => {
         if (error) {
           toast({
@@ -57,19 +52,7 @@ const Dashboard = () => {
 
           return;
         }
-
-        const formattedData = data.map((file: any) => {
-          return {
-            id: file.id,
-            fileName: file.filename,
-            type: file.filetype,
-            time: new Date(file.created_at).toLocaleString(),
-          };
-        });
-
-        setData(formattedData);
-
-        console.log("file list", formattedData);
+        setData(data);
       });
   }, [ascending, sortBy, toast, user]);
 

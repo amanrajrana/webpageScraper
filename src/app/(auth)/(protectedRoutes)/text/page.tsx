@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import UserContext from "@/context/user/userContext";
-import { handleUploadText } from "@/lib/textUpload";
+import { handleUploadText } from "@/utils/textUpload";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { ChangeEvent, useContext, useState } from "react";
 

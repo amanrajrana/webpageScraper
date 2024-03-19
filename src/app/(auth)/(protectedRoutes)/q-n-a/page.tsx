@@ -7,7 +7,7 @@ import AccordionSection from "./components/accordion";
 import { QnAType } from "@/types/type";
 import QnAInputBox from "./components/newQnAInputBox";
 import { toast } from "@/components/ui/use-toast";
-import { handleUploadText } from "@/lib/textUpload";
+import { handleUploadText } from "@/utils/textUpload";
 import UserContext from "@/context/user/userContext";
 import { FileNameModal } from "@/components/fileNameModal";
 

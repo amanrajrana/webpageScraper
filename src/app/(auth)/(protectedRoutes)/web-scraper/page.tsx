@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import UrlInputBox from "./components/urlInputBox";
 import { WebScrapeDataType } from "@/types/type";
 import { DataTable } from "./components/dataTable";
-import StartTraining from "./components/startTraining";
+import StartTraining from "./components/floatingButton";
 
 export default function WebScraperPage() {
   const [data, setData] = useState<WebScrapeDataType[]>([]);

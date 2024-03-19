@@ -1,6 +1,5 @@
 "use client";
 
-import supabase from "@/utils/supabase/supabase";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,10 +10,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import authService from "@/utils/supabase/authServices";
+import UserContext from "@/context/user/userContext";
 
 type message = {
   type: "success" | "error";
@@ -23,6 +24,8 @@ type message = {
 
 const SignUp = () => {
   const router = useRouter();
+  const { user } = useContext(UserContext);
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<message | null>();
@@ -30,15 +33,10 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   useEffect(() => {
-    getUser();
-  });
-
-  const getUser = async () => {
-    const { data, error } = await supabase.auth.refreshSession();
-    if (data.user && data.session) {
+    if (user) {
       router.replace("/dashboard");
     }
-  };
+  }, [user, router]);
 
   // Handle request for Magic Link
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,12 +54,10 @@ const SignUp = () => {
     setLoading(true); // Set loading state
 
     // Send magic link to email
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await authService.signUpNewUser({
       email: email,
       password: password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
+      redirectTo: `${window.location.origin}/dashboard`,
     });
 
     // Handle error
