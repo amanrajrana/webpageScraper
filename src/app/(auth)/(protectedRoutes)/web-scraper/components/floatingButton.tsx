@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Info, Loader2Icon, Upload } from "lucide-react";
 import UserContext from "@/context/user/userContext";
-import { fileService } from "@/utils/openai/fileService";
+import handleUploadFile from "@/utils/services/uploadFile";
 
 const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
   const { user } = useContext(UserContext);
@@ -38,7 +38,7 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
     if (!user) throw new Error("Unauthorized user. Please login.");
 
     const fileName = url.hostname;
-    const res = await fileService.uploadFile({
+    const res = await handleUploadFile({
       data: file,
       fileName,
       userId: user.id,

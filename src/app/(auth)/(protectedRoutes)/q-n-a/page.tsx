@@ -7,9 +7,9 @@ import AccordionSection from "./components/accordion";
 import { QnAType } from "@/types/type";
 import QnAInputBox from "./components/newQnAInputBox";
 import { toast } from "@/components/ui/use-toast";
-import { fileService } from "@/utils/openai/fileService";
 import UserContext from "@/context/user/userContext";
 import { FileNameModal } from "@/components/fileNameModal";
+import handleUploadFile from "@/utils/services/uploadFile";
 
 /* The code is defining a React functional component called `QuestionAndAnswerPage`. */
 export default function QuestionAndAnswerPage() {
@@ -48,7 +48,7 @@ export default function QuestionAndAnswerPage() {
 
     if (!user) throw new Error("Unauthorized user. Please login.");
 
-    const res = await fileService.uploadFile({
+    const res = await handleUploadFile({
       data: new Blob([txtFileContent], { type: "text/plain" }),
       editable: true,
       fileName,

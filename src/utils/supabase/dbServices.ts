@@ -89,7 +89,7 @@ export class DbServices {
         "id, openai_id, purpose, filename, size, status, filetype, created_at, editable, source)"
       )
       .eq("id", info.fileId)
-      .filter("user_id", "eq", info.userId);
+      .eq("user_id", info.userId);
 
     if (error) return { error, data: null };
 
@@ -112,6 +112,15 @@ export class DbServices {
       },
       error: null,
     } as { data: FileMetaData; error: null };
+  }
+
+  //* Delete File by id
+  async deleteFileById(info: { fileId: number; userId: string }) {
+    return await this.supabase
+      .from("openai_datavault")
+      .delete()
+      .eq("id", info.fileId)
+      .eq("user_id", info.userId);
   }
 }
 

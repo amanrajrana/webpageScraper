@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import UserContext from "@/context/user/userContext";
-import { fileService as openaiFileService } from "@/utils/openai/fileService";
+import handleUploadFile from "@/utils/services/uploadFile";
 
 export default function FileUploadPage() {
   const { user } = useContext(UserContext);
@@ -35,7 +35,7 @@ export default function FileUploadPage() {
 
     if (!user) throw new Error("Unauthorized user. Please login.");
 
-    const { error } = await openaiFileService.uploadFile({
+    const { error } = await handleUploadFile({
       data: file,
       editable: false,
       fileName,

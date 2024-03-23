@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import UserContext from "@/context/user/userContext";
-import { fileService } from "@/utils/openai/fileService";
+import handleUploadFile from "@/utils/services/uploadFile";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { ChangeEvent, useContext, useState } from "react";
 
@@ -31,7 +31,7 @@ export default function TextUploadPage() {
       return;
     }
 
-    const res = await fileService.uploadFile({
+    const res = await handleUploadFile({
       data: new Blob([text], { type: "text/plain" }),
       editable: true,
       fileName,
