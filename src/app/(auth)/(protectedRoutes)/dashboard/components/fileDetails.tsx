@@ -4,7 +4,7 @@ import { FileMetaData } from "@/types/type";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import FileDetailsComponent from "./FileDetailsComponent";
 import { Loader } from "lucide-react";
-import fileService from "@/utils/supabase/fileServices";
+import fileService from "@/utils/supabase/dbServices";
 
 const FileDetailsArea = ({ id }: any) => {
   const { user } = useContext(UserContext);
@@ -16,8 +16,6 @@ const FileDetailsArea = ({ id }: any) => {
   const fetchedData = useCallback(async () => {
     setFileData(undefined);
     setLoading(true);
-
-    console.log("fetching data: ", id);
 
     if (!user) {
       toast({

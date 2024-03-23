@@ -16,6 +16,19 @@ export type openaiResponseType = {
   status_details: string | null;
 };
 
+export type SaveUploadedFileMetadata = openaiResponseType & {
+  userId: string;
+  editable: boolean;
+  fileType: string;
+  source: string;
+};
+
+export type SaveTextContentToDB = {
+  content: string;
+  userId: string;
+  fileId: number;
+};
+
 export type QnAType = {
   id: number;
   question: string;
@@ -43,14 +56,15 @@ export type UserCredential = {
 
 export type FileMetaData = {
   bytes: number;
-  db_id: number;
-  file_id: number;
+  created_at: string;
+  id: number;
   filename: string;
-  id: string;
+  filetype: string;
+  source: string;
+  editable: boolean;
+  openai_id: string;
   purpose: string;
   status: string;
-  created_at: string;
-  filetype: string;
 };
 
 export type FileData = {
@@ -64,3 +78,13 @@ export type SaveResponseToDB = openaiResponseType & {
   user_id: string;
   file_id: number;
 };
+
+export type OpenaiDeleteFileResponse =
+  | {
+      data: { id: string; object: string; deleted: Boolean };
+      error: null;
+    }
+  | {
+      data: null;
+      error: string;
+    };

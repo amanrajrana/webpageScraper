@@ -8,6 +8,7 @@ import { useState } from "react";
 import { WebScrapeDataType } from "@/types/type";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2Icon } from "lucide-react";
+import CONF from "@/conf/conf";
 
 type Message = {
   type: "error" | "success" | "warning";
@@ -46,7 +47,7 @@ export default function UrlInputBox({ setData }: Props) {
     try {
       // Call API to fetch data
       const response = await axios.get(
-        `${API_URL}/api/scrape/${
+        `${CONF.webScraperAPI}/api/scrape/${
           isFetchAll ? "multi" : "single"
         }-url?url=${url}`
       );

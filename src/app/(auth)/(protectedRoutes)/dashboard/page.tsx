@@ -10,7 +10,7 @@ import { Data } from "@/types/type";
 import FileMetaDataState from "@/context/fileData/fileDataState";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
-import fileService from "@/utils/supabase/fileServices";
+import fileService from "@/utils/supabase/dbServices";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);

@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import UserContext from "@/context/user/userContext";
-import { handleUploadFileToOpenAI } from "@/utils/openai/fileUpload";
-import fileService from "@/utils/supabase/fileServices";
+import { fileService as openaiFileService } from "@/utils/openai/fileService";
 
 export default function FileUploadPage() {
   const { user } = useContext(UserContext);
@@ -21,26 +20,6 @@ export default function FileUploadPage() {
     setSelectedFile(null);
   };
 
-  // Function to convert file to base64
-  const getFileAsBase64 = async (file: File) => {
-    const reader = new FileReader();
-    return new Promise<string>((resolve, reject) => {
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        if (e.target?.result) {
-          resolve(e.target.result as string);
-        } else {
-          reject(new Error("FileReader failed to load file"));
-        }
-      };
-
-      reader.onerror = (e) => {
-        reject(new Error("FileReader encountered an error while reading file"));
-      };
-
-      reader.readAsDataURL(file);
-    });
-  };
-
   // Function to handle file submission
   const handleSubmission = async () => {
     console.log("Submitting file");
@@ -48,43 +27,35 @@ export default function FileUploadPage() {
 
     setLoading(true);
 
-    try {
-      const fileName = selectedFile.name;
-      const fileType = selectedFile.type;
+    const fileName = selectedFile.name;
+    const fileType = selectedFile.type;
 
-      // Saving file to DB
-      const fileData = await getFileAsBase64(selectedFile);
+    // Uploading file to OpenAI
+    const file = new Blob([selectedFile], { type: selectedFile.type });
 
-      // Uploading file to OpenAI
-      const data = new Blob([selectedFile], { type: selectedFile.type });
+    if (!user) throw new Error("Unauthorized user. Please login.");
 
-      if (!user) throw new Error("Unauthorized user. Please login.");
+    const { error } = await openaiFileService.uploadFile({
+      data: file,
+      editable: false,
+      fileName,
+      fileType: selectedFile.type,
+      source: "local",
+      userId: user.id,
+    });
 
-      const openaiResponse = await handleUploadFileToOpenAI(data, fileName);
-      const fileId = await fileService.uploadFile({
-        fileData,
-        fileType,
-        fileName,
-        userId: user.id,
-      });
-
+    if (error) {
       toast({
-        description: "File uploaded to OpenAI Database successfully.",
-      });
-
-      await fileService.saveResponseToDB({
-        ...openaiResponse,
-        file_id: fileId,
-        user_id: user.id,
-      });
-    } catch (error: SuppressedError | any) {
-      toast({
-        title: error?.status || "Error",
-        description: error.message || "Error uploading file",
+        title: error.code || "Error",
+        description: error.message,
         variant: "destructive",
       });
-      console.error(error);
+      return;
     }
+
+    toast({
+      description: "File uploaded to OpenAI Database successfully.",
+    });
 
     setLoading(false);
   };

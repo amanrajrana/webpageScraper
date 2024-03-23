@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import UserContext from "@/context/user/userContext";
-import { handleUploadText } from "@/utils/textUpload";
+import { fileService } from "@/utils/openai/fileService";
 import { Loader2Icon, RotateCcw, Upload } from "lucide-react";
 import { ChangeEvent, useContext, useState } from "react";
 
@@ -31,15 +31,26 @@ export default function TextUploadPage() {
       return;
     }
 
-    try {
-      await handleUploadText({ text, user_id: user.id, fileName });
-    } catch (error: any) {
+    const res = await fileService.uploadFile({
+      data: new Blob([text], { type: "text/plain" }),
+      editable: true,
+      fileName,
+      fileType: "text/plain",
+      source: "textbox",
+      userId: user.id,
+    });
+
+    if (res.error) {
       toast({
-        title: error?.code || "Error",
-        description: error.message,
+        title: res.error.code || "Error",
+        description: res.error.message,
         variant: "destructive",
       });
+      setLoading(false);
+      return;
     }
+
+    //TODO: Save the text content in db as well so user can edit in future
 
     setLoading(false);
     setText("");

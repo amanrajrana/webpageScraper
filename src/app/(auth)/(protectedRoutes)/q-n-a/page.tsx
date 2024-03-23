@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Loader2Icon, Plus, RotateCcw, Upload } from "lucide-react";
-import { use, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import AccordionSection from "./components/accordion";
 import { QnAType } from "@/types/type";
 import QnAInputBox from "./components/newQnAInputBox";
 import { toast } from "@/components/ui/use-toast";
-import { handleUploadText } from "@/utils/textUpload";
+import { fileService } from "@/utils/openai/fileService";
 import UserContext from "@/context/user/userContext";
 import { FileNameModal } from "@/components/fileNameModal";
 
@@ -39,31 +39,38 @@ export default function QuestionAndAnswerPage() {
 
   const handleUpload = async () => {
     setLoading(true);
-    try {
-      const txtFileContent = qAndA
-        .map(
-          (item) =>
-            "Question: " + item.question + "\n" + "Answer: " + item.answer
-        )
-        .join("\n\n\n\n");
 
-      if (!user) throw new Error("Unauthorized user. Please login.");
+    const txtFileContent = qAndA
+      .map(
+        (item) => "Question: " + item.question + "\n" + "Answer: " + item.answer
+      )
+      .join("\n\n\n\n");
 
-      await handleUploadText({
-        text: txtFileContent,
-        user_id: user.id,
-        fileName,
-      });
-    } catch (error: any) {
+    if (!user) throw new Error("Unauthorized user. Please login.");
+
+    const res = await fileService.uploadFile({
+      data: new Blob([txtFileContent], { type: "text/plain" }),
+      editable: true,
+      fileName,
+      fileType: "text/plain",
+      userId: user.id,
+      source: "qnabox",
+    });
+
+    if (res.error) {
       toast({
-        title: error?.code || "Error",
-        description: error.message,
+        title: res.error.code || "Error",
+        description: res.error.message,
         variant: "destructive",
       });
+
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    //TODO: Save the text content in db as well so user can edit in future
 
+    setLoading(false);
     setQAndA([]);
   };
 

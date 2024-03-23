@@ -5,8 +5,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Info, Loader2Icon, Upload } from "lucide-react";
 import UserContext from "@/context/user/userContext";
-import { handleUploadFileToOpenAI } from "@/utils/openai/fileUpload";
-import fileService from "@/utils/supabase/fileServices";
+import { fileService } from "@/utils/openai/fileService";
 
 const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
   const { user } = useContext(UserContext);
@@ -36,34 +35,26 @@ const StartTraining = ({ data }: { data: WebScrapeDataType[] }) => {
 
     const file = new Blob([txtFileContent], { type: "text/plain" });
 
-    try {
-      if (!user) throw new Error("Unauthorized user. Please login.");
+    if (!user) throw new Error("Unauthorized user. Please login.");
 
-      const fileName = url.hostname;
-      const [response, file_id] = await Promise.all([
-        handleUploadFileToOpenAI(file, fileName),
-        fileService.uploadFile({
-          fileData: fileName,
-          fileType: "url",
-          fileName: fileName,
-          userId: user.id,
-        }),
-      ]);
+    const fileName = url.hostname;
+    const res = await fileService.uploadFile({
+      data: file,
+      fileName,
+      userId: user.id,
+      editable: false,
+      fileType: "url",
+      source: url.hostname,
+    });
 
-      await fileService.saveResponseToDB({
-        ...response,
-        user_id: user.id,
-        file_id,
-      });
-    } catch (error: any) {
-      console.log(error);
+    if (res.error) {
       toast({
-        title: error?.code || "Error",
-        description: error.message,
+        title: res.error.code || "Error",
+        description: res.error.message,
         variant: "destructive",
       });
+      return;
     }
-
     setLoading(false);
   }
 
