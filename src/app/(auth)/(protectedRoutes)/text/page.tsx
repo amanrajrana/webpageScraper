@@ -117,9 +117,9 @@ export default function TextUploadPage() {
     }
 
     if (mode === "edit") {
-      updateEditedFile();
+      await updateEditedFile();
     } else {
-      handleUploadNew();
+      await handleUploadNew();
     }
 
     setLoading(false);
