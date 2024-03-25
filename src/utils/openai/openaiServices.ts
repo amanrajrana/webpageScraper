@@ -1,8 +1,5 @@
-import { toast } from "@/components/ui/use-toast";
 import CONF from "@/conf/conf";
-import { OpenaiDeleteFileResponse } from "@/types/type";
-import axios, { AxiosError } from "axios";
-import dbService from "@/utils/supabase/dbServices";
+import axios from "axios";
 
 export class OpenaiServices {
   apiURL;
@@ -15,6 +12,8 @@ export class OpenaiServices {
 
   //* Upload file to OpenAI
   async uploadFile(file: FormData) {
+    try {
+    } catch (error) {}
     const axiosParams = {
       method: "POST",
       url: this.apiURL,
@@ -29,7 +28,7 @@ export class OpenaiServices {
   }
 
   //* Delete file from OpenAI
-  async deleteFile(fileId: string): Promise<OpenaiDeleteFileResponse> {
+  async deleteFile(fileId: string) {
     const axiosParams = {
       method: "DELETE",
       url: this.apiURL + `/${fileId}`,
@@ -39,13 +38,7 @@ export class OpenaiServices {
       },
     };
 
-    const response = await axios(axiosParams);
-
-    if (response.data.error) {
-      return { error: response.data.error.message, data: null };
-    }
-
-    return { data: response.data, error: null };
+    return await axios(axiosParams);
   }
 }
 

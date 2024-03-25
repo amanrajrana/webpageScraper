@@ -1,14 +1,18 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
+import FileDataContext from "@/context/fileData/fileDataContext";
 import { Data } from "@/types/type";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 
 type Prams = {
-  data: Data[];
-  setId: Dispatch<SetStateAction<number>>;
+  setId: Dispatch<SetStateAction<number | undefined>>;
   setToggle: Dispatch<SetStateAction<boolean>>;
 };
 
-const FileListArea = ({ data, setId, setToggle }: Prams) => {
+const FileListArea = ({ setId, setToggle }: Prams) => {
+  const { data } = useContext(FileDataContext);
+
   const onClickHandler = (id: number) => {
     setToggle(true);
     setId(id);

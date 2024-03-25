@@ -60,7 +60,7 @@ export type FileMetaData = {
   id: number;
   filename: string;
   filetype: string;
-  source: string;
+  source: "qnabox" | "textbox" | "url" | "local";
   editable: boolean;
   openai_id: string;
   purpose: string;

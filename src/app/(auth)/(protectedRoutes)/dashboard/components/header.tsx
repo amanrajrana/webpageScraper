@@ -9,22 +9,14 @@ import {
   SelectLabel,
   SelectTrigger,
 } from "@/components/ui/select";
+import FileDataContext from "@/context/fileData/fileDataContext";
 import { Value } from "@radix-ui/react-select";
 import { MoveDown, MoveUp } from "lucide-react";
+import { useContext } from "react";
 
-type Props = {
-  sortBy: "Date" | "Name";
-  setSortBy: (value: "Date" | "Name") => void;
-  ascending: boolean;
-  setAscending: (value: boolean) => void;
-};
-
-const DashboardHeader = ({
-  sortBy,
-  setSortBy,
-  ascending,
-  setAscending,
-}: Props) => {
+const DashboardHeader = () => {
+  const { sortBy, setSortBy, ascending, setAscending } =
+    useContext(FileDataContext);
   return (
     <div>
       <h1 className="text-xl font-bold">Dashboard</h1>

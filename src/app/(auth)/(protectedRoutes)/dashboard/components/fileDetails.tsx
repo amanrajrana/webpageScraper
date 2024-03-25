@@ -6,7 +6,12 @@ import FileDetailsComponent from "./FileDetailsComponent";
 import { Loader } from "lucide-react";
 import fileService from "@/utils/supabase/dbServices";
 
-const FileDetailsArea = ({ id }: any) => {
+type Prams = {
+  id: number;
+  setId: React.Dispatch<React.SetStateAction<number | undefined>>;
+};
+
+const FileDetailsArea = ({ id, setId }: Prams) => {
   const { user } = useContext(UserContext);
   const { toast } = useToast();
 
@@ -64,7 +69,7 @@ const FileDetailsArea = ({ id }: any) => {
       <Loader className="animate-spin" />
     </div>
   ) : fileData ? (
-    <FileDetailsComponent fileData={fileData} />
+    <FileDetailsComponent fileData={fileData} setId={setId} />
   ) : (
     <p className="w-full h-full flex justify-center items-center">
       No data found

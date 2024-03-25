@@ -10,29 +10,27 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
+import { RefObject } from "react";
 
 type Props = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
   fileName: string;
   setFileName: (fileName: string) => void;
   cb: () => void;
+  fileNameModalRef: RefObject<HTMLButtonElement>;
 };
 
 export function FileNameModal({
-  open,
-  setOpen,
   fileName,
   setFileName,
   cb,
+  fileNameModalRef,
 }: Props) {
-  const handleClicked = () => {
-    setOpen(false);
-    cb();
-  };
-
   return (
-    <AlertDialog open={open}>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button ref={fileNameModalRef} className="hidden" />
+      </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Enter File Name</AlertDialogTitle>
@@ -47,10 +45,8 @@ export function FileNameModal({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setOpen(false)}>
-            Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction disabled={!fileName} onClick={handleClicked}>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction disabled={!fileName} onClick={cb}>
             Upload
           </AlertDialogAction>
         </AlertDialogFooter>

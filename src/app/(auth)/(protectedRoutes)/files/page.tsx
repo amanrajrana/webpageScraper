@@ -58,6 +58,7 @@ export default function FileUploadPage() {
     });
 
     setLoading(false);
+    handleReset();
   };
 
   return (

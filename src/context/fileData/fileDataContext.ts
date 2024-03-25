@@ -1,16 +1,26 @@
-import { FileMetaData } from "@/types/type";
+import { Data } from "@/types/type";
 import { Dispatch, SetStateAction, createContext } from "react";
 
 type FileDataContextType = {
-  fileMetaData: null | FileMetaData;
+  data: Data[];
   loading: boolean;
-  setFileId: Dispatch<SetStateAction<string>>;
+  sortBy: "Date" | "Name";
+  ascending: boolean;
+  setAscending: Dispatch<SetStateAction<boolean>>;
+  setSortBy: (value: "Date" | "Name") => void;
+  fetchedData: () => void;
+  setData: Dispatch<SetStateAction<Data[]>>;
 };
 
-const FileMetaDataContext = createContext<FileDataContextType>({
-  fileMetaData: null,
+const FileDataContext = createContext<FileDataContextType>({
+  data: [],
   loading: false,
-  setFileId: () => {},
+  sortBy: "Date",
+  ascending: false,
+  setAscending: () => {},
+  setSortBy: () => {},
+  fetchedData: () => {},
+  setData: () => {},
 });
 
-export default FileMetaDataContext;
+export default FileDataContext;

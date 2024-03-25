@@ -19,10 +19,6 @@ const handleUploadFile = async (data: UploadFileProps) => {
 
   const response = await openaiServices.uploadFile(file);
 
-  toast({
-    description: "File uploaded to OpenAI successfully.",
-  });
-
   if (response.data.error) {
     toast({
       title: response.data.error.code || "Error",

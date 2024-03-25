@@ -115,11 +115,69 @@ export class DbServices {
   }
 
   //* Delete File by id
-  async deleteFileById(info: { fileId: number; userId: string }) {
+  async deleteFileById(info: { id: number; userId: string }) {
     return await this.supabase
       .from("openai_datavault")
       .delete()
+      .eq("id", info.id)
+      .eq("user_id", info.userId);
+  }
+
+  //* Get text content by file ID
+  async getTextContentByFileId(info: {
+    fileId: number;
+    userId: string;
+    source: "qnabox" | "textbox";
+  }) {
+    const { data, error } = await this.supabase
+      .from("openai_datavault")
+      .select("id, filename, openai_id, text_files (content)")
       .eq("id", info.fileId)
+      .eq("user_id", info.userId)
+      .eq("source", info.source);
+
+    if (error) return { data: null, error };
+
+    console.log("data: ", data[0]);
+
+    if (data.length < 1) {
+      return { data: null, error: { message: "No data found" } };
+    }
+
+    return {
+      data: {
+        data: data[0].text_files[0].content,
+        openaiId: data[0].openai_id,
+        filename: data[0].filename,
+      },
+      error: null,
+    };
+  }
+
+  //* Update text content by file ID
+  async updateTextContentByFileId(info: {
+    content: string;
+    fileId: number;
+    userId: string;
+  }) {
+    return await this.supabase
+      .from("text_files")
+      .update({ content: info.content, updated_at: new Date().toISOString() })
+      .eq("file_id", info.fileId)
+      .eq("user_id", info.userId);
+  }
+
+  //* Update'openai_id' filed in  openai_vault
+  async updateOpenaiIdAndFileName(info: {
+    id: number;
+    fileName: string;
+    openai_id: string;
+    userId: string;
+  }) {
+    return await this.supabase
+      .from("openai_datavault")
+      .update({ openai_id: info.openai_id, filename: info.fileName })
+      .eq("id", info.id)
       .eq("user_id", info.userId);
   }
 }

@@ -1,5 +1,10 @@
+import LoadingSpinner from "@/components/loadingSpinner";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import FileDataContext from "@/context/fileData/fileDataContext";
+import UserContext from "@/context/user/userContext";
 import { FileMetaData } from "@/types/type";
+import handleDeleteFile from "@/utils/services/deletFile";
 import {
   Circle,
   Clock8,
@@ -7,16 +12,56 @@ import {
   FolderGit2,
   HardDrive,
   Info,
+  Loader2Icon,
   Paperclip,
   Pencil,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
+import { useContext, useState } from "react";
 
-type Props = {
+type Prams = {
   fileData: FileMetaData;
+  setId: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
-function FileDetailsComponent({ fileData }: Props) {
+function FileDetailsComponent({ fileData, setId }: Prams) {
+  const { user } = useContext(UserContext);
+  const { data, setData } = useContext(FileDataContext);
+  const { toast } = useToast();
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const deleteFile = async () => {
+    if (!confirm("Are you sure you want to delete this file?") || !user) return;
+
+    setLoading(true);
+    const { error } = await handleDeleteFile({
+      id: fileData.id,
+      openai_id: fileData.openai_id,
+      userId: user.id,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Unable to delete file",
+      });
+
+      setLoading(false);
+      return;
+    }
+
+    toast({
+      description: "File deleted",
+    });
+
+    setLoading(false);
+    const newData = data.filter((file) => file.id !== fileData.id);
+    setData([...newData]);
+    setId(undefined);
+  };
   return (
     <div className="p-3 space-y-4">
       <div className="flex justify-between w-full">
@@ -25,8 +70,17 @@ function FileDetailsComponent({ fileData }: Props) {
           <p className="text-lg font-bold">{fileData.filename}</p>
         </div>
 
-        <Button variant={"destructive"} size={"icon"}>
-          <Trash2 size={18} />
+        <Button
+          onClick={deleteFile}
+          disabled={loading}
+          variant={"destructive"}
+          size={"icon"}
+        >
+          {loading ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <Trash2 size={18} />
+          )}
         </Button>
       </div>
 
@@ -76,9 +130,15 @@ function FileDetailsComponent({ fileData }: Props) {
 
       {fileData.editable && (
         <div className="flex w-full items-center justify-end">
-          <Button className="gap-x-1 px-3">
-            <Pencil size={14} />
-            Edit
+          <Button className="gap-x-1 px-3" asChild>
+            <Link
+              href={`${
+                fileData.source === "qnabox" ? "/q-n-a" : "/text"
+              }?mode=edit&fileid=${fileData.id}`}
+            >
+              <Pencil size={14} />
+              Edit
+            </Link>
           </Button>
         </div>
       )}
