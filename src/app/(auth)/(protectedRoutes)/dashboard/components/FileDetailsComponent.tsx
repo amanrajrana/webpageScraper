@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import FileDataContext from "@/context/fileData/fileDataContext";
 import UserContext from "@/context/user/userContext";
 import { FileMetaData } from "@/types/type";
-import handleDeleteFile from "@/utils/services/deletFile";
+import handleDeleteFile from "@/utils/services/deleteFile";
 import {
   Circle,
   Clock8,
